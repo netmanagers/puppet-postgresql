@@ -504,12 +504,12 @@ class postgresql (
   }
 
   service { 'postgresql':
-    ensure     => $postgresql::manage_service_ensure,
-    name       => $postgresql::real_service,
-    enable     => $postgresql::manage_service_enable,
-    hasstatus  => $postgresql::service_status,
-    pattern    => $postgresql::process,
-    require    => Package['postgresql'],
+    ensure    => $postgresql::manage_service_ensure,
+    name      => $postgresql::real_service,
+    enable    => $postgresql::manage_service_enable,
+    hasstatus => $postgresql::service_status,
+    pattern   => $postgresql::process,
+    require   => Package['postgresql'],
   }
 
   file { 'postgresql.conf':
@@ -526,7 +526,8 @@ class postgresql (
     audit   => $postgresql::manage_audit,
   }
 
-  if $postgresql::source_hba or $postgresql::template_hba {
+  if ($postgresql::source_hba and $postgresql::source_hba != '')
+  or ($postgresql::template_hba and $postgresql::template_hba != '') {
     file { 'postgresql_hba.conf':
       ensure  => $postgresql::manage_file,
       path    => $postgresql::real_config_file_hba,
@@ -544,7 +545,7 @@ class postgresql (
 
 
   # The whole postgresql configuration directory can be recursively overriden
-  if $postgresql::source_dir {
+  if $postgresql::source_dir and $::postgresql::source_dir != '' {
     file { 'postgresql.dir':
       ensure  => directory,
       path    => $postgresql::real_config_dir,
@@ -560,7 +561,7 @@ class postgresql (
 
 
   ### Include custom class if $my_class is set
-  if $postgresql::my_class {
+  if $postgresql::my_class and $postgresql::my_class != '' {
     include $postgresql::my_class
   }
 
